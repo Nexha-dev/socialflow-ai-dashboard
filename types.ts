@@ -5,7 +5,9 @@ export enum View {
   CREATE_POST = 'CREATE_POST',
   MEDIA_LIBRARY = 'MEDIA_LIBRARY',
   INBOX = 'INBOX',
-  SETTINGS = 'SETTINGS'
+  SETTINGS = 'SETTINGS',
+  PORTFOLIO = 'PORTFOLIO',
+  DEVELOPER_TOOLS = 'DEVELOPER_TOOLS'
 }
 
 export interface NavItem {
@@ -58,18 +60,6 @@ export enum Platform {
   YOUTUBE = 'youtube',
   LINKEDIN = 'linkedin',
   X = 'x'
-}
-
-export enum View {
-  DASHBOARD = 'DASHBOARD',
-  ANALYTICS = 'ANALYTICS',
-  CALENDAR = 'CALENDAR',
-  CREATE_POST = 'CREATE_POST',
-  MEDIA_LIBRARY = 'MEDIA_LIBRARY',
-  INBOX = 'INBOX',
-  SETTINGS = 'SETTINGS',
-  PORTFOLIO = 'PORTFOLIO',
-  DEVELOPER_TOOLS = 'DEVELOPER_TOOLS'
 }
 
 export interface BlockchainAsset {
