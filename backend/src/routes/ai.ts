@@ -1,37 +1,32 @@
 import { Router, Request, Response } from 'express';
-import { generateHashtagSuggestions } from '../services/hashtagGeneratorService';
+import { analyzeImage, GeminiServiceError } from '../../../services/geminiService';
 
 const router = Router();
 
-router.get('/hashtags', async (req: Request, res: Response) => {
-  const text = typeof req.query.text === 'string' ? req.query.text.trim() : '';
-  const platform = typeof req.query.platform === 'string' ? req.query.platform : 'instagram';
-  const maxTagsValue = typeof req.query.maxTags === 'string' ? Number.parseInt(req.query.maxTags, 10) : 10;
-  const useAi = req.query.useAi !== 'false';
+/**
+ * POST /ai/analyze-image
+ * Accepts an image (base64 buffer or URL) and returns an AI-generated social media caption.
+ *
+ * Body:
+ *   imageData   {string}  Base64-encoded image data or a public image URL (required)
+ *   mimeType    {string}  MIME type, e.g. "image/jpeg" (optional, default: "image/jpeg")
+ *   context     {string}  Optional prompt context to guide caption style/topic
+ */
+router.post('/analyze-image', async (req: Request, res: Response) => {
+  const { imageData, mimeType, context } = req.body;
 
-  if (!text) {
-    res.status(400).json({
-      error: 'The "text" query parameter is required.',
-    });
-    return;
+  if (!imageData) {
+    return res.status(400).json({ error: 'imageData is required.' });
   }
 
-  const maxTags = Number.isFinite(maxTagsValue) && maxTagsValue > 0 ? Math.min(maxTagsValue, 20) : 10;
-
   try {
-    const result = await generateHashtagSuggestions({
-      text,
-      platform,
-      maxTags,
-      useAi,
-    });
-
-    res.json(result);
+    const caption = await analyzeImage(imageData, mimeType, context);
+    return res.json({ caption });
   } catch (error) {
-    res.status(500).json({
-      error: 'Failed to generate hashtags.',
-      details: error instanceof Error ? error.message : String(error),
-    });
+    if (error instanceof GeminiServiceError) {
+      return res.status(422).json({ error: error.message, code: error.code });
+    }
+    return res.status(500).json({ error: 'Internal server error.' });
   }
 });
 
